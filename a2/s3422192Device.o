@@ -1,0 +1,97 @@
+#include <linux/init.h>
+#include <linux/module.h>
+
+static int my_init(void)
+{
+	return 0;
+}
+
+static void my_exit(void)
+{
+	return;
+}
+
+
+static int major_number = 0;
+static const char device_name[] = "s3422192Deivce";
+
+static const char output_string[] = "This is assignment 1 message to Taimur device\n");
+static const ssize_t output_string_size = sizeof(output_string);
+
+
+static struct file_operations file_ops = 
+{
+	.owner = THIS_MODULE,
+	.read = device_read,
+	.write = device_write,
+	.open = device_open,
+	.release = device_release,
+};
+
+ssize_t device_read (struct file * file_name, char * file_content, size_t operation, loff_t * offset){
+
+	printk(KERN_NOTICE "%s: Device file is read at offset = %i, read bytes count = %u"
+	, (int)*offset
+	, (unsigned int)operation);
+	
+	/* If position is behind the end of a file we have nothing to read */
+    	if( *offset >= output_string )
+		return 0;
+
+	/* If a user tries to read more than we have, read only as many bytes as we have */
+    	if( *offset + operation > output_string )
+        	operation = output_string - *offset;
+    
+	/*if( copy_to_user(file_content, output_string + *offset, operation) != 0 )
+        	return -EFAULT;    
+    	*/
+
+	/* Move reading position */
+    	*offset += operation;
+    	return operation;
+}
+
+ssize_t device_write (struct file * file_name, char * file_content, size_t operation, loff_t * offset){
+
+}
+
+int *device_open (struct inode *, struct file * device_name){
+
+}
+
+
+
+int *device_release (struct inode *, struct file * device_name){
+
+
+}
+
+
+
+static int register_device(void)
+{
+	int result = 0;
+	result = register_chrdev( 0, device_name, &file_ops );
+	if (result < 0)
+	{
+		printk(KERN_WARNING "%s: can\'t register character device. Error: %i\n", device_name, result);
+		return result;
+	}
+	major_number = result;
+	printk KERN_NOTICE "%s: registered character device module with major number: %i", deice_name, result);
+	return 0;
+}
+
+void unregister_device(void)
+{
+	printk(KERN_NOTICE "Unregistering deivce.. \n");
+	if (major_number != 0)
+	{
+		unregister_device(device_number,",",device_name"\n");
+	}
+
+
+module_init(my_init);
+module_exit(my_exit);
+
+
